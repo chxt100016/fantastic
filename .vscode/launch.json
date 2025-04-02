@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-FantasticmonkeyApplication<fantasticmonkey>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.chxt.fantasticmonkey.FantasticmonkeyApplication",
+            "projectName": "fantasticmonkey",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

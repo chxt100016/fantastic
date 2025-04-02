@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import com.chxt.fantasticmonkey.enums.TimetableEnum;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +40,15 @@ public class TennisProperty {
         }
 
     }
+
+    public boolean checkLimit(Boolean isWeekend, TimetableEnum timetableEnum, Integer hour) {
+        if (isWeekend) {
+            return timetableEnum.equals(TimetableEnum.HL_INDOOR) ? this.intDoorWeekendHours.contains(hour) : this.outDoorWeekendHours.contains(hour);
+        } else {
+            return timetableEnum.equals(TimetableEnum.HL_INDOOR) ? this.inDoorWeekdayHours.contains(hour) : this.outDoorWeekdayHours.contains(hour);
+        }
+    }
+
 
     private List<Integer> getContent(String name, List<Environment> environments){
         String[] arr = environments.stream().filter(item -> name.equals(item.getName())).map(Environment::getContent).findFirst().orElse("").split(",");

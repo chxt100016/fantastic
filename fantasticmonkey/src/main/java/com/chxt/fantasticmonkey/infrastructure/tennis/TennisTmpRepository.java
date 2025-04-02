@@ -1,14 +1,13 @@
 package com.chxt.fantasticmonkey.infrastructure.tennis;
 
-import com.chxt.fantasticmonkey.model.tennis.TennisCourt;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import com.chxt.fantasticmonkey.model.tennis.TennisCourt;
 
 @Component
 public class TennisTmpRepository {
@@ -21,22 +20,9 @@ public class TennisTmpRepository {
 
     private volatile List<TennisCourt> lastDiff = new ArrayList<>();
 
-    public synchronized boolean checkHasIncrement(List<TennisCourt> list) {
-        boolean res = false;
-        List<TennisCourt> diff = new ArrayList<>();
-        Map<String, TennisCourt> map = list.stream().collect(Collectors.toMap(item -> item.getDateStr() + item.getPlace() + item.getStartTime() + item.getFieldName(), Function.identity()));
-        for (String s : map.keySet()) {
-            if(this.mapTmp.get(s) == null) {
-                this.alarmSensor = true;
-                res = true;
-                diff.add(map.get(s));
-            }
-        }
-
-        this.lastDiff = diff;
-        this.mapTmp = map;
-
-        return res;
+    public synchronized void updateLastDiff(List<TennisCourt> list) {
+        this.lastDiff = list;
+        this.alarmSensor = true;
     }
 
     public synchronized List<TennisCourt> getLastDiff() {

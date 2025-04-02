@@ -1,6 +1,7 @@
 package com.chxt.fantasticmonkey.infrastructure.huanglong;
 
 import com.chxt.fantastic.common.http.HttpOperator;
+import com.chxt.fantasticmonkey.enums.TimetableEnum;
 import com.chxt.fantasticmonkey.model.huanglong.BookInfoRequest;
 import com.chxt.fantasticmonkey.model.huanglong.BookInfoResponse;
 import com.chxt.fantasticmonkey.model.tennis.TennisCourt;
@@ -13,6 +14,10 @@ import java.util.List;
 
 @Component
 public class HuangLongClient {
+
+    private final static String uri = "https://field.hlsports.net/api/orderlists/get/book";
+
+    
 
     //
     public List<TennisCourt> getOutdoorAndIndoor(int dayRange) {
@@ -44,11 +49,11 @@ public class HuangLongClient {
                 .build();
         BookInfoResponse response = new HttpOperator()
                 .jsonHeader()
-                .uri("https://field.hlsports.net/api/orderlists/get/book")
+                .uri(uri)
                 .entity(entity)
                 .doPost()
                 .result(BookInfoResponse.class);
-        return TennisCourt.getList(date, response, "outdoor");
+        return TennisCourt.getList(response, date, TimetableEnum.HL_OUTDOOR);
     }
 
     public List<TennisCourt> getInnerBookInfo(Date date) {
@@ -63,11 +68,11 @@ public class HuangLongClient {
                 .build();
         BookInfoResponse response = new HttpOperator()
                 .jsonHeader()
-                .uri("https://field.hlsports.net/api/orderlists/get/book")
+                .uri(uri)
                 .entity(entity)
                 .doPost()
                 .result(BookInfoResponse.class);
 
-        return TennisCourt.getList(date, response, "indoor");
+        return TennisCourt.getList(response, date, TimetableEnum.HL_INDOOR);
     }
 }

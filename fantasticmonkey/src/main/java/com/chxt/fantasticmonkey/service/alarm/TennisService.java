@@ -1,33 +1,37 @@
 package com.chxt.fantasticmonkey.service.alarm;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.chxt.fantasticmonkey.domain.tennis.TennisCourtSelector;
-import com.chxt.fantasticmonkey.domain.tennis.TennisReportGenerator;
+import com.chxt.fantasticmonkey.domain.timetable.TimeTableGenerator;
 import com.chxt.fantasticmonkey.infrastructure.env.EnvRepository;
 import com.chxt.fantasticmonkey.infrastructure.huanglong.HuangLongClient;
 import com.chxt.fantasticmonkey.infrastructure.tennis.TennisTmpRepository;
 import com.chxt.fantasticmonkey.model.property.TennisProperty;
 import com.chxt.fantasticmonkey.model.tennis.TennisCourt;
-import freemarker.template.Configuration;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import javax.annotation.Resource;
-import java.util.List;
+import com.chxt.fantasticmonkey.model.timetable.TimeTableCell;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 public class TennisService {
 
-    @Resource
-    private FreeMarkerConfigurer freeMarkerConfigurer;
+
 
     @Resource
     private HuangLongClient huangLongClient;
 
     @Resource
-    private EnvRepository EnvRepository;
+    private EnvRepository envRepository;
 
     @Resource
     private TennisTmpRepository tmpRepository;
@@ -42,29 +46,30 @@ public class TennisService {
     }
 
     public void BookInfoQuery() {
-        TennisProperty property = this.EnvRepository.getTennisReport();
+        TennisProperty property = this.envRepository.getTennisReport();
 
         // 获取网球场信息
         List<TennisCourt> tennisCourts = this.huangLongClient.getOutdoorAndIndoor(property.getDayRange());
         // 过滤需要的场地
-        TennisCourtSelector selector = new TennisCourtSelector(tennisCourts, property);
-        List<TennisCourt> targetCourt = selector.getTargetCourt();
-        if (targetCourt.isEmpty()) {
+        TennisCourtSelector selector = new TennisCourtSelector(property);
+        List<TennisCourt> targetCourt = selector.getTargetCourt(tennisCourts, this.tmpRepository.getLastDiff());
+        if (CollectionUtils.isEmpty(targetCourt)) {
             return;
         }
 
-        // 校验是否有新增的场地
-        boolean hasIncrement = this.tmpRepository.checkHasIncrement(targetCourt);
+        this.tmpRepository.updateLastDiff(targetCourt);
 
-        // 有新增场地 生成图片
-        if (hasIncrement) {
-            List<TennisCourt> lastDiff = this.tmpRepository.getLastDiff();
-            Configuration configuration = freeMarkerConfigurer.getConfiguration();
-            TennisReportGenerator generator = new TennisReportGenerator(configuration, targetCourt, lastDiff);
-            byte[] image = generator.get();
-            this.tmpRepository.setImage(image);
-        }
+        List<TimeTableCell> timeTables = targetCourt.stream()
+                .map(item -> new TimeTableCell(item.getDate(), item.getTimetableEnum()))
+                .collect(Collectors.toList());
+    
 
+
+        
+    
+        TimeTableGenerator generator = new TimeTableGenerator();
+        byte[] image = generator.renderTimetable(timeTables);
+        this.tmpRepository.setImage(image);
     }
 
     public byte[] getImage() {
