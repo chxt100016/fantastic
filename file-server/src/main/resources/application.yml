@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: dev
+server:
+  port: 9999
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+root:
+  path: /Users/chenxintong/Downloads
+image:
+  path: /Users/chenxintong/Downloads
+video:
+  path: /Users/chenxintong/Downloads
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+root:
+  path: /root/file
+image:
+  path: /root/file/albums
+video:
+  path: /etc/download/complete

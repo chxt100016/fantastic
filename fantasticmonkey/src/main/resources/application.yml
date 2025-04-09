@@ -1,0 +1,73 @@
+spring:
+  output:
+      ansi:
+        enabled: always
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: mongodb://fantastic:123456@192.168.1.222:27017/fantastic
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.222:3306/fantasticmonkey
+    username: root
+    password: root
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+freemarker:
+  template-loader-path: classpath:/templates
+open_dota:
+  token: f2f069e7-ffbd-4920-a91d-ea03778c4b70
+  url: https://api.opendota.com/api
+
+ezviz:
+  # 告警图片下载
+  alarm_img_path: /file/albums/alarm
+  include:
+    - G69552993
+server:
+  port: 8888
+
+kanban:
+  img_base_path: /file/albums/kanban
+uri:
+    aqara: https://open-cn.aqara.com/v3.0/open/api
+
+logging:
+    level:
+        org.openqa.selenium: ERROR
+        org.apache.http.client.protocol: ERROR
+        org.apache.http.impl.conn.PoolingHttpClientConnectionManager: INFO
+
+flag:
+  version: 123
+
+proxy:
+  solr:
+    servlet_url: /solr/*
+    target_url: http://solrserver:8983/solr
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+alarm:
+  tennis:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+alarm:
+  tennis:
+    enabled: true
+  

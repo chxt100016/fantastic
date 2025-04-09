@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: prod
+server:
+  port: 9999
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+root:
+  path: /Users/chenxintong/Downloads/12345
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+root:
+  path: /root/file
+image:
+  path: /root/file/albums
+
+
